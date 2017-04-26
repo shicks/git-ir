@@ -139,7 +139,8 @@ sub require_pristine {
 }
 
 # Handle special commands, regardless of EDITOR.
-if ($ARGV[0] eq '--must') {
+my $command = $ARGV[0] || '';
+if ($command eq '--must') {
   run "$ARGV[1]";
   my $result = ($? == -1) || ($? & 255) ? 255 : ($? >> 8);
   if ($result) {
@@ -160,7 +161,7 @@ if ($ARGV[0] eq '--must') {
   exit $result;
 }
 
-if ($ARGV[0] eq '--branch') {
+if ($command eq '--branch') {
   require_pristine();
   my $hooks = $ARGV[1] ne '--nohooks';
   shift unless $hooks;
@@ -173,7 +174,7 @@ if ($ARGV[0] eq '--branch') {
   exec 'git', 'rebase', '--edit-todo';
 }
 
-if ($ARGV[0] eq '--push') {
+if ($command eq '--push') {
   require_pristine();
   my $cur = out 'git rev-parse HEAD';
   $ENV{'APPEND'} = "exec false STACK $cur";
@@ -181,13 +182,13 @@ if ($ARGV[0] eq '--push') {
   exec 'git', 'rebase', '--edit-todo';
 }
 
-if ($ARGV[0] eq '--pop') {
+if ($command eq '--pop') {
   require_pristine();
   $ENV{'GIT_EDITOR'} = "$0 __POP__";
   exec 'git', 'rebase', '--edit-todo';
 }
 
-if ($ARGV[0] eq '--rewrite') {
+if ($command eq '--rewrite') {
   $ENV{'GIT_EDITOR'} = "$0 __REWRITE__";
   exec 'git', 'rebase', '--edit-todo';
 }
