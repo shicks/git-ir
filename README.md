@@ -133,3 +133,16 @@ a----b----c----d----g----h----i----j
   \     G        \          E    F         H
    p----q         k----m----l----o----r----s
 ```
+
+## Hooks
+
+`git ir` defaults to running an extra hook on each rebased branch.
+If a `post-rebase-tree` hook is found, it will be run once for each
+`branch` command in the todo, after all commits are rebased.
+
+No command-line arguments are passed to the hook, but it may inspect
+the current repository state to determine which branch/commit it is
+on.
+
+Hooks can be suppressed by passing `--nohooks` during the initial
+invocation of `git ir`.
