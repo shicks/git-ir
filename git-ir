@@ -12,6 +12,13 @@
 # 1. multiple branches on the same commit aren't both moved
 ############################################################
 
+# TODO:
+#  - learn from hg revsets
+#  - maybe arg-less runs from HEAD until we see a merge
+#  - git ir feature..master
+#  - git ir ..master ?
+#  - support tagging?  - workflow of submitting one change at a time?
+
 use strict;
 use warnings;
 use File::Temp qw/tempfile/;
@@ -242,9 +249,15 @@ if ($ENV{'GIT_EDITOR'} =~ /^$0 /) {
       system "cp $ENV{'INIT'} $file";
       unlink $ENV{'INIT'};
     }
+    # NOTE: emacs seems to want to launch some weird new builtin
+    # git-rebase-todo mode, so change the filename enough that
+    # it won't try to be smart.
+    my ($fh, $tmpname) = tempfile('git-ir-todo-XXXXX'); close $fh;
+    system 'cp', $file, $tmpname;
     # Invoke the normal editor only if interactive
-    system $ENV{'OLDEDITOR'}, $file;
+    system $ENV{'OLDEDITOR'}, $tmpname;
     my $result = ($? == -1) || ($? & 255) ? 255 : ($? >> 8);
+    system 'mv', $tmpname, $file;
     # Post-process the file
     post_process $file;
     exit $result;
